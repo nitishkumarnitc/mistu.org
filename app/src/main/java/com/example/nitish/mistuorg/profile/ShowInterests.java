@@ -44,7 +44,7 @@ public class ShowInterests extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Constants.HOME_URL + "profile/interests..php", values,
+        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Constants.HOME_URL + "profile/interests.php/", values,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -69,7 +69,7 @@ public class ShowInterests extends AppCompatActivity {
 
 
 
-        private boolean parseJsonServerResponse(JSONObject result)throws JSONException{
+         private boolean parseJsonServerResponse(JSONObject result)throws JSONException{
 
             ArrayList<ShowInterestsListItem> listItems=new ArrayList<>(); //array to store details of help Requests by users.
             ShowInterestsListAdapter adapter;

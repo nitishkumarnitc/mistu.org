@@ -33,10 +33,11 @@ public class HelpedFragment extends Fragment {
     private Context context;
     private View rootView;
     private int currentUserId;
-    private String  TAG="PROFILE_HELPED_FRAGMENT";
+    private String  TAG="PROFILE_HELPED";
 
     public HelpedFragment() {
         // Required empty public constructor
+      //  Toast.makeText(getActivity().getBaseContext(), TAG, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -45,6 +46,7 @@ public class HelpedFragment extends Fragment {
         context=inflater.getContext();
         rootView= inflater.inflate(R.layout.fragment_helped, container, false);
         currentUserId= Constants.getCurrentUserID(context);
+      //  Toast.makeText(context, TAG,Toast.LENGTH_SHORT).show();
         getProfileHelped();
         return rootView;
     }
@@ -64,7 +66,7 @@ public class HelpedFragment extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("HelpedFragmenReq",response.toString());
+                        Log.d(TAG,response.toString());
                         try {
                             displayHelpedList(response);
                         } catch (JSONException e) {
@@ -87,6 +89,7 @@ public class HelpedFragment extends Fragment {
 
         private void displayHelpedList(JSONObject result)throws JSONException{
             ArrayList<ProfileListItem> listItems=new ArrayList<>(); //array to store details of help Requests by users.
+            listItems.clear();
             AcceptsAdapter adapter;
             int count=0;
 
@@ -111,7 +114,7 @@ public class HelpedFragment extends Fragment {
                 String stream=jo.getString("stream");
                 String dept=jo.getString("department");
 
-                String cat=jo.getString("category");
+                String cat=jo.getString(Constants.CATEGORY);
                 String title=jo.getString("title");
                 String description=jo.getString("description");
                 int helpId=Integer.parseInt(jo.getString("help_id"));
@@ -155,12 +158,12 @@ public class HelpedFragment extends Fragment {
 
             adapter = new AcceptsAdapter(context,listItems);
 
-            ListView profAccListView=(ListView)rootView.findViewById(R.id.profile_helped_list_view);
-            if(profAccListView==null){
+            ListView profHelpedListView=(ListView)rootView.findViewById(R.id.profile_helped_list_view);
+            if(profHelpedListView==null){
                 //Log.e("EMPTY", "List view is empty");
             }else {
-                profAccListView.setAdapter(adapter);
-                profAccListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                profHelpedListView.setAdapter(adapter);
+                profHelpedListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         //list item on click :)
@@ -171,7 +174,11 @@ public class HelpedFragment extends Fragment {
 
         }
 
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        AppController.getInstance().cancelPendingRequest(TAG);
+    }
 }
 
 

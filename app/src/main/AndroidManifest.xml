@@ -33,17 +33,18 @@
         <activity android:name=".ask.TAG" />
         <activity android:name=".profile.Profile" />
         <activity android:name=".profile.ShowInterests" />
-        <activity android:name=".ahr.AHR"/>
-        <activity android:name=".ahr.HRDetailView"/>
-        <activity android:name=".settings.Setting"/>
-        <activity android:name=".settings.Reset"/>
-        <activity android:name=".search.Search"
-            android:theme="@style/BeginTheme"/>
+        <activity android:name=".ahr.AHR" />
+        <activity android:name=".ahr.HRDetailView" />
+        <activity android:name=".settings.Setting" />
+        <activity android:name=".settings.Reset" />
+        <activity
+            android:name=".search.Search"
+            android:theme="@style/BeginTheme" />
         <activity
             android:name=".notification.Notification"
             android:theme="@style/BeginTheme" />
-
-        <activity android:name=".Contact"></activity>
+        <activity android:name=".Contact" />
+        <activity android:name=".profile.ProfileView"></activity>
     </application>
 
 </manifest>

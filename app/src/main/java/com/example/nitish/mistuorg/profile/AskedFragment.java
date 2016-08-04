@@ -3,6 +3,7 @@ package com.example.nitish.mistuorg.profile;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -35,10 +36,11 @@ public class AskedFragment extends Fragment {
     private Context context;
     private View rootView;
     private int currentUserId;
-    private String TAG="PROFILE_ASKED_FRAGMENT";
+    private String TAG="PROFILE_ASKED";
 
     public AskedFragment() {
         // Required empty public constructor
+       // Toast.makeText(getActivity().getBaseContext(), TAG, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -47,11 +49,14 @@ public class AskedFragment extends Fragment {
         context=inflater.getContext();
         rootView= inflater.inflate(R.layout.fragment_asked, container, false);
         currentUserId= Constants.getCurrentUserID(context);
+       // Toast.makeText(context, TAG, Toast.LENGTH_SHORT).show();
         getProfileAsked();
         return rootView;
     }
 
     private void getProfileAsked(){
+
+        Log.d(TAG,"getProfileAskedCalled");
         JSONObject values=new JSONObject();
         try {
             values.put("CODE","get_profile_asked_notif");
@@ -62,34 +67,36 @@ public class AskedFragment extends Fragment {
         }
 
 
-        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Constants.HOME_URL +"profile/notif.php/", values,
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST, Constants.HOME_URL + "profile/notif.php/", values,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("GET ASKED NOTIF",response.toString());
+                        Log.d(TAG,response.toString());
                         try {
                             displayAskedList(response);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 if (error instanceof NetworkError) {
-                    Toast.makeText(context,Constants.NO_NET_WORK_CONNECTION, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "No NetWork Connection", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        AppController.getInstance().addToRequestQueue(request,TAG);
+        AppController.getInstance().addToRequestQueue(jsonObjectRequest,TAG);
 
     }
 
 
 
         private void displayAskedList(JSONObject result)throws JSONException{
+
+            Log.d(TAG,"display asked called");
             final ArrayList<ProfileListItem> listItems=new ArrayList<>(); //array to store details of help Requests by users.
+            listItems.clear();
             AcceptsAdapter adapter;
             int count=0;
 
@@ -98,8 +105,6 @@ public class AskedFragment extends Fragment {
             jsonArray=result.getJSONArray(Constants.SERVER_RESPONSE);
             size=jsonArray.length();
 
-            //Log.d("Profile",result.toString());
-
             if(size==0){
                 return;
             }
@@ -107,14 +112,14 @@ public class AskedFragment extends Fragment {
 
             for(int i=0;i<size;i++){
                 JSONObject jo=jsonArray.getJSONObject(i);
+                SharedPreferences sharedPreferences=context.getSharedPreferences(Constants.SHARED_PREF,Context.MODE_PRIVATE);
+                String fname=sharedPreferences.getString(Constants.FNAME,"");
+                String lname=sharedPreferences.getString(Constants.LNAME,"");
+                String sex=sharedPreferences.getString(Constants.SEX,"");
+                String stream=sharedPreferences.getString(Constants.STREAM,"");
+                String dept=sharedPreferences.getString(Constants.DEPARTMENT,"");
 
-                String fname=jo.getString(Constants.FNAME);
-                String lname=jo.getString(Constants.LNAME);
-                String sex=jo.getString(Constants.SEX);
-                String stream=jo.getString(Constants.STREAM);
-                String dept=jo.getString(Constants.DEPARTMENT);
-
-                String cat=jo.getString("category");
+                String cat=jo.getString(Constants.CATEGORY);
                 String title=jo.getString("title");
                 String description=jo.getString("description");
                 int helpId=Integer.parseInt(jo.getString("help_id"));
@@ -176,6 +181,12 @@ public class AskedFragment extends Fragment {
 
 
         }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        AppController.getInstance().cancelPendingRequest(TAG);
+    }
 
 }
 

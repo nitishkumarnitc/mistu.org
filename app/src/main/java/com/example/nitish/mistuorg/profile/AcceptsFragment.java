@@ -2,6 +2,7 @@ package com.example.nitish.mistuorg.profile;
 
 
 import android.content.Context;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -34,10 +35,11 @@ public class AcceptsFragment extends Fragment {
     private Context context;
     private View rootView;
     private int currentUserId;
-    private String TAG="PROFILE_ACCEPTS_FRAGMENT";
+    private String TAG="PROFILE_ACCEPTS";
 
     public AcceptsFragment() {
         // Required empty public constructor
+       // Toast.makeText(getActivity().getBaseContext(), TAG, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -46,6 +48,7 @@ public class AcceptsFragment extends Fragment {
         context=inflater.getContext();
         rootView= inflater.inflate(R.layout.fragment_accepts, container, false);
         currentUserId= Constants.getCurrentUserID(context);
+       // Toast.makeText(context, TAG, Toast.LENGTH_SHORT).show();
         getProfileAccepts();
         return rootView;
     }
@@ -106,7 +109,7 @@ public class AcceptsFragment extends Fragment {
                 String stream=jo.getString("stream");
                 String dept=jo.getString("department");
 
-                String cat=jo.getString("category");
+                String cat=jo.getString(Constants.CATEGORY);
                 String title=jo.getString("title");
                 String description=jo.getString("description");
                 int helpId=Integer.parseInt(jo.getString("help_id"));
@@ -166,5 +169,9 @@ public class AcceptsFragment extends Fragment {
 
         }
 
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        AppController.getInstance().cancelPendingRequest(TAG);
+    }
 }

@@ -1,6 +1,11 @@
 package com.example.nitish.mistuorg.search;
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +17,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.example.nitish.mistuorg.R;
 import com.example.nitish.mistuorg.app.AppController;
+import com.example.nitish.mistuorg.profile.ProfileView;
 import com.example.nitish.mistuorg.utils.Constants;
 ;
 import java.util.ArrayList;
@@ -53,15 +59,53 @@ public class SearchResultAdapter extends BaseAdapter{
         final ImageView contact=(ImageView)convertView.findViewById(R.id.helper_detail_contact);
 
         NetworkImageView profilePic=(NetworkImageView) convertView.findViewById(R.id.helper_detail_pic);
-        SearchResultUser item=listItems.get(position);
+        final SearchResultUser item=listItems.get(position);
 
         name.setText(item.getName());
         branch.setText(item.getBranchStream());
         profilePic.setImageUrl(Constants.getImagesUrl(item.getUserId()),imageLoader);
 
-        if(!item.getHasUserConfirmed()){
-            tick.setVisibility(View.GONE);
+        if(item.getHasUserConfirmed()!=1){
+            contact.setVisibility(View.GONE);
         }
+
+
+        contact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(item.getHasUserConfirmed()==1){
+                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                    callIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    String mobileNo="tel:"+item.getMobile();
+                    callIntent.setData(Uri.parse(mobileNo));
+                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+                    context.startActivity(callIntent);
+                }
+            }
+        });
+
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(context, ProfileView.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("HELPER_ID",item.getUserId());
+                intent.putExtra(Constants.FNAME,item.getName());
+                intent.putExtra("MOBILE_NO",item.getMobile());
+                intent.putExtra("HAS_USER_CONFIRMED",item.getHasUserConfirmed());
+                context.startActivity(intent);
+            }
+        });
 
         return convertView;
     }

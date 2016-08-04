@@ -55,6 +55,7 @@ public class Constants {
      public static final String TAG2="tag2";
      public static final String TAG3="tag3";
      public static final String CATEGORY="categories";
+    public static final String STATUS="status";
 
 
     public static void  saveUserDetails(Context context,JSONObject response){
@@ -109,6 +110,15 @@ public class Constants {
 
     public static String getImagesUrl(int id){
         return (IMAGES_URL+id+".jpg");
+    }
+
+    public static String getCurrentFname(Context context){
+        SharedPreferences sharedPreferences=context.getSharedPreferences(SHARED_PREF,Context.MODE_PRIVATE);
+        return sharedPreferences.getString(FNAME,"");
+    }
+    public static String getCurrentLname(Context context){
+        SharedPreferences sharedPreferences=context.getSharedPreferences(SHARED_PREF,Context.MODE_PRIVATE);
+        return sharedPreferences.getString(LNAME,"");
     }
 
 }

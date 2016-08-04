@@ -1,5 +1,6 @@
 package com.example.nitish.mistuorg.search;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -124,6 +126,7 @@ public class Search extends AppCompatActivity {
         try {
             values.put("CODE","userInterests");
             values.put("INTEREST",userIp);
+            values.put("USER_ID",Constants.getCurrentUserID(this));
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -149,7 +152,8 @@ public class Search extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                if(error instanceof NetworkError)
+                    Toast.makeText(Search.this, Constants.NO_NET_WORK_CONNECTION, Toast.LENGTH_SHORT).show();
             }
         });
         AppController.getInstance().addToRequestQueue(jsonObjectRequest,TAG);
@@ -163,7 +167,7 @@ public class Search extends AppCompatActivity {
 
             JSONArray jsonArray;
             int size;
-            jsonArray=result.getJSONArray("server_response");
+            jsonArray=result.getJSONArray(Constants.SERVER_RESPONSE);
             size=jsonArray.length();
 
             //Log.d("Profile",result.toString());
@@ -185,13 +189,15 @@ public class Search extends AppCompatActivity {
                 String stream=jo.getString(Constants.STREAM);
                 String dept=jo.getString(Constants.DEPARTMENT);
                 int userId=Integer.parseInt(jo.getString(Constants.USER_ID));
+                String mobile=jo.getString(Constants.MOBILE);
+                int hasUserConfirmed=Integer.parseInt(jo.getString(Constants.STATUS));
 
                 fname=fname.substring(0,1).toUpperCase() + fname.substring(1);
                 lname=lname.substring(0,1).toUpperCase() + lname.substring(1);
 
                 String branchStream=dept+", "+stream;
 
-                listItems.add(new SearchResultUser(branchStream,false,fname+" "+lname,userId));
+                listItems.add(new SearchResultUser(branchStream,hasUserConfirmed,fname+" "+lname,userId,mobile));
 
             }
 
@@ -201,12 +207,6 @@ public class Search extends AppCompatActivity {
                 Log.e("EMPTY", "List view is empty");
             }else {
                 listView.setAdapter(adapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        //onClick handler
-                    }
-                });
             }
 
         return true;

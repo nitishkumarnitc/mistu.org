@@ -6,6 +6,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -44,10 +45,7 @@ public class Profile extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.profile_viewpager);
         setupViewPager(viewPager);
 
-        tabLayout = (TabLayout) findViewById(R.id.profile_tabs);
-        if(tabLayout!=null) {
-            tabLayout.setupWithViewPager(viewPager);
-        }
+
 
     }
 
@@ -73,7 +71,6 @@ public class Profile extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent=new Intent(getApplicationContext(),ShowInterests.class);
-                    intent.putExtra("USERID",currentUserId);
                     startActivity(intent);
                 }
             });
@@ -83,16 +80,20 @@ public class Profile extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-
-        adapter.addFragment(new AcceptsFragment(), "Accepted");
         adapter.addFragment(new AskedFragment(), "Asked");
-        adapter.addFragment(new HelpedFragment(), "Helped");
+        adapter.addFragment(new AcceptsFragment(), "Accepts");
+
+       adapter.addFragment(new HelpedFragment(), "Helped");
         viewPager.setAdapter(adapter);
+        tabLayout = (TabLayout) findViewById(R.id.profile_tabs);
+        if(tabLayout!=null) {
+            tabLayout.setupWithViewPager(viewPager);
+        }
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
+    class ViewPagerAdapter extends FragmentStatePagerAdapter {
+        private  List<Fragment> mFragmentList = new ArrayList<>();
+        private  List<String> mFragmentTitleList = new ArrayList<>();
 
         public ViewPagerAdapter(FragmentManager manager) {
             super(manager);
@@ -100,14 +101,13 @@ public class Profile extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            Log.d("Fragment Clicked ",String.valueOf(position+1));
+             Log.d("getItem "+mFragmentTitleList.get(position),String.valueOf(position));
             return mFragmentList.get(position);
+
         }
 
         @Override
         public int getCount() {
-            //return mFragmentList.size();
-            Log.d("Fragment size",String.valueOf(mFragmentList.size()));
             return mFragmentList.size();
         }
 
