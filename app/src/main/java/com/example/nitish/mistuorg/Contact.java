@@ -126,21 +126,8 @@ public class Contact extends AppCompatActivity {
 
     }
 
-           private void displayAHRList(JSONObject result)throws JSONException{
-
-            Log.d("ContactInfo",result.toString());
-
-            JSONArray jsonArray;
-            int size;
-            jsonArray=result.getJSONArray(Constants.SERVER_RESPONSE);
-            size=jsonArray.length();
-
-            if(size==0){
-                return;
-            }
-
-            JSONObject jo=jsonArray.getJSONObject(0);
-
+           private void displayAHRList(JSONObject jo)throws JSONException{
+            jo=jo.getJSONObject(Constants.SERVER_RESPONSE);
             String fname=jo.getString(Constants.FNAME);
             String lname=jo.getString(Constants.LNAME);
             String stream=jo.getString(Constants.STREAM);

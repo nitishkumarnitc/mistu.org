@@ -32,13 +32,25 @@ public class AskedHelpInfo extends AppCompatActivity {
     private CheckBox done;
     private int currentUserId;
     private String TAG="PROFILE_ASKED_HELP_INFO";
-
+    private String title;
+    private String description;
+    private String category;
+    private String TAG1;
+    private String TAG2;
+    private String TAG3;
+    private String askedOn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String title=getIntent().getStringExtra("TITLE");
-        helpId=getIntent().getIntExtra("HELPID",0);
+        helpId=getIntent().getIntExtra(Constants.HELP_ID,-1);
+        title=getIntent().getStringExtra(Constants.TITLE);
+        description=getIntent().getStringExtra(Constants.DESCRIPTION);
+        category=getIntent().getStringExtra(Constants.CATEGORY);
+        TAG1=getIntent().getStringExtra(Constants.TAG1);
+        TAG2=getIntent().getStringExtra(Constants.TAG2);
+        TAG3=getIntent().getStringExtra(Constants.TAG3);
+
         setContentView(R.layout.activity_asked_help_info);
         currentUserId= Constants.getCurrentUserID(this);
 
@@ -80,7 +92,7 @@ public class AskedHelpInfo extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Constants.HOME_URL + "profile/helpers.php/",
+        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Constants.HOME_URL + "profile/helpersforasked.php/",values,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -120,11 +132,11 @@ public class AskedHelpInfo extends AppCompatActivity {
             for(int i=0;i<size;i++){
                 JSONObject jo=jsonArray.getJSONObject(i);
 
-                String fname=jo.getString("fname");
-                String lname=jo.getString("lname");
-                String stream=jo.getString("stream");
-                String dept=jo.getString("department");
-                int helperId=Integer.parseInt(jo.getString("helperId"));
+                String fname=jo.getString(Constants.FNAME);
+                String lname=jo.getString(Constants.LNAME);
+                String stream=jo.getString(Constants.STREAM);
+                String dept=jo.getString(Constants.DEPARTMENT);
+                int helperId=Integer.parseInt(jo.getString(Constants.USER_ID));
 
                 fname=fname.substring(0,1).toUpperCase() + fname.substring(1);
                 lname=lname.substring(0,1).toUpperCase() + lname.substring(1);

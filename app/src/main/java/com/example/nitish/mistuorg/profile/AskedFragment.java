@@ -172,8 +172,12 @@ public class AskedFragment extends Fragment {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent intent=new Intent(context,AskedHelpInfo.class);
-                        intent.putExtra("HELPID",listItems.get(position).getHelpId());
-                        intent.putExtra("TITLE",listItems.get(position).getTitle());
+                        intent.putExtra(Constants.HELP_ID,listItems.get(position).getHelpId());
+                        intent.putExtra(Constants.TITLE,listItems.get(position).getTitle());
+                        intent.putExtra(Constants.CATEGORY,listItems.get(position).getCategory());
+                        intent.putExtra(Constants.TAG1,listItems.get(position).getTag1());
+                        intent.putExtra(Constants.TAG2,listItems.get(position).getTag2());
+                        intent.putExtra(Constants.TAG3,listItems.get(position).getTag3());
                         startActivity(intent);
                     }
                 });

@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +31,12 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.nitish.mistuorg.app.AppController;
 import com.example.nitish.mistuorg.utils.Constants;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,6 +50,9 @@ import java.util.Map;
  */
 public class RegisterFragment extends Fragment {
 
+    private FirebaseAuth mAuth;
+    private  FirebaseAuth.AuthStateListener mAuthStateListener;
+
 
     private View rootView=null;
     private Context context=null;
@@ -49,10 +60,6 @@ public class RegisterFragment extends Fragment {
     private ProgressDialog nDialog;
     private static  final String TAG_NETCHECK="Login NetCheck";
     private static final String TAG="Register Fragment";
-
-    /**
-     * Defining layout items.
-     **/
 
     EditText inputFirstName;
     EditText inputLastName;
@@ -75,6 +82,20 @@ public class RegisterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView=inflater.inflate(R.layout.fragment_register, container, false);
         context=inflater.getContext();
+
+        mAuth=FirebaseAuth.getInstance();
+        mAuthStateListener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user=firebaseAuth.getCurrentUser();
+                if(user!=null){
+                    Log.d(TAG,"onAuthStateChanged:signedIn"+user.getUid());
+                }else{
+                    Log.d(TAG,"onAuthStateChanged:signedOut");
+                }
+            }
+        };
+
 
         /**
          * Defining all layout items
@@ -115,6 +136,27 @@ public class RegisterFragment extends Fragment {
     }
 
 
+    private void createAccount(String email,String password){
+        Log.d(TAG,"createAccount"+email);
+
+        mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
+
+                // If sign in fails, display a message to the user. If sign in succeeds
+                // the auth state listener will be notified and logic to handle the
+                // signed in user can be handled in the listener.
+                if (!task.isSuccessful()) {
+                    Toast.makeText(context,"auth_failed",
+                            Toast.LENGTH_SHORT).show();
+                }else{
+                    Log.d(TAG,"user_created");
+                }
+            }
+        });
+    }
+
 
     private void sendRegisterRequest(){
         Log.d(TAG, "sending Register Request");
@@ -151,6 +193,8 @@ public class RegisterFragment extends Fragment {
             e.printStackTrace();
         }
 
+        createAccount(inputEmail.getText().toString(),inputPassword.getText().toString());
+
         JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Constants.HOME_URL + "login/", params,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -167,6 +211,25 @@ public class RegisterFragment extends Fragment {
                                 SharedPreferences sharedPreferences=context.getSharedPreferences(Constants.SHARED_PREF,Context.MODE_PRIVATE);
                                 Log.d("User id is ",String.valueOf(sharedPreferences.getInt(Constants.USER_ID,0)));
                                 Toast.makeText(context, "User id is"+String.valueOf(sharedPreferences.getInt(Constants.USER_ID,0)), Toast.LENGTH_SHORT).show();
+
+                                // updating name and profile pic of user
+                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(inputFirstName+" "+inputLastName)
+                                        .setPhotoUri(Uri.parse(Constants.getImagesUrl(sharedPreferences.getInt(Constants.USER_ID,0))))
+                                        .build();
+
+                                user.updateProfile(profileUpdates)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Log.d(TAG, "User profile updated.");
+                                                }
+                                            }
+                                        });
+
                                 goToVerification();
 
                             }
@@ -291,6 +354,20 @@ public class RegisterFragment extends Fragment {
     private void goToVerification(){
         Intent intent = new Intent(context, Verification.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(mAuthStateListener!=null){
+            mAuth.removeAuthStateListener(mAuthStateListener);
+        }
     }
 }
 

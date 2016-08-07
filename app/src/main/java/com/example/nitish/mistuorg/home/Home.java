@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,19 +20,32 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.example.nitish.mistuorg.Begin;
 import com.example.nitish.mistuorg.R;
 import com.example.nitish.mistuorg.ahr.AHR;
+import com.example.nitish.mistuorg.app.AppController;
 import com.example.nitish.mistuorg.ask.ASKActivity;
 import com.example.nitish.mistuorg.interests.Registered;
 import com.example.nitish.mistuorg.notification.Notification;
+import com.example.nitish.mistuorg.notification.NotificationListener;
 import com.example.nitish.mistuorg.profile.Profile;
 import com.example.nitish.mistuorg.search.Search;
 import com.example.nitish.mistuorg.settings.Setting;
 import com.example.nitish.mistuorg.utils.Constants;
+import com.firebase.client.Firebase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 @SuppressWarnings("ResourceType")
 public class Home extends Activity implements View.OnClickListener {
 
@@ -47,6 +61,16 @@ public class Home extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_home_layout);
+        if(Constants.isRegisteredWithFCM(Home.this)){
+            //Start your notification listener
+            Toast.makeText(Home.this,"device already Registered", Toast.LENGTH_SHORT).show();
+            startService(new Intent(getBaseContext(),NotificationListener.class));
+        }else{
+            Toast.makeText(Home.this,"device not Registered", Toast.LENGTH_SHORT).show();
+            registerDeviceWithFCM();
+        }
+        Firebase.setAndroidContext(this);
+
         currentUserId=Constants.getCurrentUserID(this);
         Log.d("USER_ID",String.valueOf(currentUserId));
 
@@ -219,6 +243,76 @@ public class Home extends Activity implements View.OnClickListener {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
         // mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+
+
+    private void registerDeviceWithFCM(){
+        Firebase firebase=new Firebase(Constants.FIREBASE_URL);
+        Firebase newFirebase=firebase.push();
+
+        // Creating a map to store key value pair
+        Map<String,String> val=new HashMap<>();
+
+        // pushing msg=none in the map
+        val.put("msg","none");
+
+        newFirebase.setValue(val);
+
+        String uniqueId=newFirebase.getKey();
+        Toast.makeText(Home.this, uniqueId, Toast.LENGTH_SHORT).show();
+
+        sendFCMIDToServer(uniqueId);
+
+    }
+
+    private void sendFCMIDToServer(final String uniqueId){
+       // PDialog.showProgressDialog(this,"Registering Notification Services");
+        final  String email=Constants.getCurrentEmailID(this).trim();
+
+        //Creating a string request
+        StringRequest req=new StringRequest(Request.Method.POST, Constants.FCM_REGISTER_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                       // PDialog.hideProgressDialog(Home.this);
+
+                        Log.d("ResponseOfServer",response.trim());
+                        // if success
+                        if(response.trim().equalsIgnoreCase("success")){
+                            Log.d("FIREBASE","REGISTERED SUCCESSFULLY");
+                            Constants.setNotificationData(Home.this,uniqueId,true);
+                            startService(new Intent(getBaseContext(),NotificationListener.class));
+                        }
+                        else if(response.trim().equalsIgnoreCase("failure")) {
+                            //Toast.makeText(getApplicationContext(), "Choose a different email", Toast.LENGTH_SHORT).show();
+                            Log.d("FIREBASE","choose different email_id");
+                        }else {
+                            Log.d("FIREBASE","unknown error");
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if(error instanceof NetworkError){
+                            Toast.makeText(Home.this, Constants.NO_NET_WORK_CONNECTION, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+        {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                //adding parameters to post request as we need to send firebase id and email
+                params.put("firebaseid", uniqueId);
+                params.put("email", email);
+                return params;
+            }
+        };
+
+        AppController.getInstance().addToRequestQueue(req,"FCM_REGISTER");
     }
 }
 

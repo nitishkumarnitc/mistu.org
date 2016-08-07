@@ -8,6 +8,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.example.nitish.mistuorg.utils.LruBitmapCache;
+import com.firebase.client.Firebase;
 
 /**
  * Created by nitish on 25-07-2016.
@@ -23,6 +24,7 @@ public class AppController extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance=this;
+        Firebase.setAndroidContext(getApplicationContext());
     }
 
     public static synchronized AppController getInstance(){

@@ -1,5 +1,7 @@
 package com.example.nitish.mistuorg.utils;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.nitish.mistuorg.R;
@@ -7,13 +9,13 @@ import com.example.nitish.mistuorg.R;
 /**
  * Created by nitish on 30-07-2016.
  */
-public class ProgressDialog extends AppCompatActivity {
+public class PDialog extends AppCompatActivity {
 
-    private android.app.ProgressDialog mProgressDialog;
+    private static ProgressDialog mProgressDialog;
 
-    public void showProgressDialog(String message) {
+    public static void showProgressDialog(Context context,String message) {
         if (mProgressDialog == null) {
-            mProgressDialog = new android.app.ProgressDialog(this);
+            mProgressDialog = new ProgressDialog(context);
             mProgressDialog.setMessage(message);
             mProgressDialog.setIndeterminate(true);
         }
@@ -21,7 +23,7 @@ public class ProgressDialog extends AppCompatActivity {
         mProgressDialog.show();
     }
 
-    public void hideProgressDialog() {
+    public static void hideProgressDialog(Context context) {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
@@ -30,6 +32,7 @@ public class ProgressDialog extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        hideProgressDialog();
+        hideProgressDialog(this);
     }
+
 }

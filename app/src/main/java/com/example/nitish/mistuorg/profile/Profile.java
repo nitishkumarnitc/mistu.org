@@ -82,7 +82,6 @@ public class Profile extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new AskedFragment(), "Asked");
         adapter.addFragment(new AcceptsFragment(), "Accepts");
-
        adapter.addFragment(new HelpedFragment(), "Helped");
         viewPager.setAdapter(adapter);
         tabLayout = (TabLayout) findViewById(R.id.profile_tabs);

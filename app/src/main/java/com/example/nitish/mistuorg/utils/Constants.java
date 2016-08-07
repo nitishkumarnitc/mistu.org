@@ -2,6 +2,7 @@ package com.example.nitish.mistuorg.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,19 +19,17 @@ public class Constants {
     public static final String NO_NET_WORK_CONNECTION="No NetWork Connection";
 
     //Fire base app url
-    public static final String FIREBASE_APP = null;
-
+    public static final String FIREBASE_URL = "https://mistu-6ebce.firebaseio.com";
     //Constant to store shared preferences
     public static final String SHARED_PREF = "user_info";
-
+    public static final String NOTIF_SHARED_PREF="notif_shared_pref";
     //To store boolean in shared preferences for if the device is registered or not
-    public static final String REGISTERED = "registered";
-
+    public static final String REGISTERED_WITH_FCM = "registered";
     //To store the fire base id in shared preferences
     public static final String FCM_UNIQUE_ID = "FCMID";
-
     //register.php address in your server
-    public static final String REGISTER_URL = "http://www.mistu.org/firebasepushnotification/register.php";
+    public static final String FCM_REGISTER_URL = "http://www.mistu.org/ihelp/pushnotification/register.php/";
+
     public static final String KEY_SUCCESS="success";
     public static final String KEY_ERROR="error";
 
@@ -55,7 +54,8 @@ public class Constants {
      public static final String TAG2="tag2";
      public static final String TAG3="tag3";
      public static final String CATEGORY="categories";
-    public static final String STATUS="status";
+     public static final String STATUS="status";
+    public static final String HELPER_ID="helper_id";
 
 
     public static void  saveUserDetails(Context context,JSONObject response){
@@ -101,6 +101,12 @@ public class Constants {
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putBoolean(Constants.IS_USER_LOGIN,false);
         editor.commit();
+        SharedPreferences sharedPreferences1=context.getSharedPreferences(NOTIF_SHARED_PREF,Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor1=sharedPreferences1.edit();
+        editor1.putBoolean(Constants.REGISTERED_WITH_FCM,false);
+        editor1.commit();
+        //Toast.makeText(context, "User Unregisterd", Toast.LENGTH_SHORT).show();
+
     }
 
     public static String getCurrentEmailID(Context context){
@@ -119,6 +125,22 @@ public class Constants {
     public static String getCurrentLname(Context context){
         SharedPreferences sharedPreferences=context.getSharedPreferences(SHARED_PREF,Context.MODE_PRIVATE);
         return sharedPreferences.getString(LNAME,"");
+    }
+    public static boolean isRegisteredWithFCM(Context context){
+        // Getting shared preference
+        SharedPreferences sharedPreferences=context.getSharedPreferences(Constants.NOTIF_SHARED_PREF,Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean(Constants.REGISTERED_WITH_FCM,false);
+    }
+
+    public static  void setNotificationData(Context context,String fcmid, boolean isUserRegisterd){
+        SharedPreferences sharedPreferences=context.getSharedPreferences(Constants.NOTIF_SHARED_PREF,Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+
+        editor.putString(Constants.FCM_UNIQUE_ID,fcmid);
+
+        editor.putBoolean(Constants.REGISTERED_WITH_FCM,isUserRegisterd);
+
+        editor.commit();
     }
 
 }

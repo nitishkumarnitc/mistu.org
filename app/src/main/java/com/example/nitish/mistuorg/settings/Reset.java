@@ -1,4 +1,6 @@
 package com.example.nitish.mistuorg.settings;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +15,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.nitish.mistuorg.R;
 import com.example.nitish.mistuorg.app.AppController;
 import com.example.nitish.mistuorg.utils.Constants;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,7 +38,6 @@ public class Reset extends AppCompatActivity {
         getSupportActionBar().setTitle(itemName);
         setView();
     }
-
 
     private void setView(){
         editText1=(EditText)findViewById(R.id.reset_editText1);
@@ -55,8 +62,11 @@ public class Reset extends AppCompatActivity {
                 if(editText1!=null) editText1.setHint("New First Name");
                 if(editText2!=null) editText2.setHint("New Last Name");
                 break;
-
             case 4:
+                editText1.setVisibility(View.GONE);
+                if (editText2!=null) editText2.setHint("Your Email address");
+                break;
+            case 5:
                 break;
         }
     }
@@ -86,8 +96,68 @@ public class Reset extends AppCompatActivity {
                 string1=editText1.getText().toString();
                 string2=editText2.getText().toString();
                 break;
-
+            case 4:
+                itemName="reset_password";
+                string2=editText2.getText().toString();
+                break;
+            default:break;
         }
+
+        if(itemName=="change_password"){
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            String newPassword = string2;
+            user.updatePassword(newPassword)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "User password updated.");
+                            }
+                        }
+                    });
+        }else if (itemName=="change_email_id"){
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            user.updateEmail(string1)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "User email address updated.");
+                            }
+                        }
+                    });
+        }else if(itemName=="change_name"){
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(string1+" "+ string2)
+                    .build();
+
+            user.updateProfile(profileUpdates)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "User profile updated.");
+                            }
+                        }
+                    });
+        }else if (itemName=="reset_password"){
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            String emailAddress = string2;
+
+            auth.sendPasswordResetEmail(emailAddress)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "Email sent.");
+                            }
+                        }
+                    });
+        }
+
         JSONObject values=new JSONObject();
         try {
             values.put("tag",itemName);

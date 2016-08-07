@@ -61,7 +61,7 @@ public class HelperDetailListAdapter extends BaseAdapter{
         branch.setText(item.getBranchStream());
 
         NetworkImageView helperImageView=(NetworkImageView) convertView.findViewById(R.id.helper_detail_pic);
-        helperImageView.setImageUrl(Constants.HOME_URL+"email/pictures"+item.getHelperId()+".jpg",imageLoader);
+        helperImageView.setImageUrl(Constants.getImagesUrl(item.getHelperId()),imageLoader);
 
         return convertView;
     }

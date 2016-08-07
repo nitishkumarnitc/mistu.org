@@ -79,13 +79,17 @@
             android:layout_marginEnd="10dp"
             />
         <com.google.android.gms.common.SignInButton
-            android:id="@+id/sign_in_button"
+            android:id="@+id/email_sign_in_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_centerInParent="true"
             android:visibility="visible"
              />
+        <com.android.volley.toolbox.NetworkImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/google_pic"/>
 
     </LinearLayout>
 </ScrollView>
