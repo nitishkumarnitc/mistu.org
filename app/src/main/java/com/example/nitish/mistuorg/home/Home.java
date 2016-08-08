@@ -1,18 +1,16 @@
 package com.example.nitish.mistuorg.home;
 
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -34,6 +32,7 @@ import com.example.nitish.mistuorg.ahr.AHR;
 import com.example.nitish.mistuorg.app.AppController;
 import com.example.nitish.mistuorg.ask.ASKActivity;
 import com.example.nitish.mistuorg.interests.Registered;
+import com.example.nitish.mistuorg.login.GoogleLoginActivity;
 import com.example.nitish.mistuorg.notification.Notification;
 import com.example.nitish.mistuorg.notification.NotificationListener;
 import com.example.nitish.mistuorg.profile.Profile;
@@ -41,13 +40,20 @@ import com.example.nitish.mistuorg.search.Search;
 import com.example.nitish.mistuorg.settings.Setting;
 import com.example.nitish.mistuorg.utils.Constants;
 import com.firebase.client.Firebase;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("ResourceType")
-public class Home extends Activity implements View.OnClickListener {
+public class Home extends FragmentActivity implements View.OnClickListener,GoogleApiClient.OnConnectionFailedListener {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -55,19 +61,35 @@ public class Home extends Activity implements View.OnClickListener {
     private CharSequence mTitle; // used to store app title
     private int currentPosition=0;
     private int currentUserId;
-
+    private FirebaseAuth mAuth;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_home_layout);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        mAuth = FirebaseAuth.getInstance();
+
+
+
         if(Constants.isRegisteredWithFCM(Home.this)){
             //Start your notification listener
             Toast.makeText(Home.this,"device already Registered", Toast.LENGTH_SHORT).show();
-            startService(new Intent(getBaseContext(),NotificationListener.class));
+            //startService(new Intent(getBaseContext(),NotificationListener.class));
         }else{
             Toast.makeText(Home.this,"device not Registered", Toast.LENGTH_SHORT).show();
-            registerDeviceWithFCM();
+           // registerDeviceWithFCM();
         }
         Firebase.setAndroidContext(this);
 
@@ -211,8 +233,17 @@ public class Home extends Activity implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case 4:
-                Constants.logOutUser(this);
-                Intent login=new Intent(getApplicationContext(), Begin.class);
+                Constants.logOutUser(getApplicationContext());
+                mAuth.signOut();
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                        new ResultCallback<Status>() {
+                            @Override
+                            public void onResult(@NonNull Status status) {
+                                Log.d("HOME,SIGN OUT CALLED",status.toString());
+                            }
+                        });
+
+                Intent login=new Intent(getApplicationContext(), GoogleLoginActivity.class);
                 login.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(login);
                 finish();
@@ -281,7 +312,7 @@ public class Home extends Activity implements View.OnClickListener {
                         // if success
                         if(response.trim().equalsIgnoreCase("success")){
                             Log.d("FIREBASE","REGISTERED SUCCESSFULLY");
-                            Constants.setNotificationData(Home.this,uniqueId,true);
+                            Constants.setNotificationData(Home.this,uniqueId);
                             startService(new Intent(getBaseContext(),NotificationListener.class));
                         }
                         else if(response.trim().equalsIgnoreCase("failure")) {
@@ -314,5 +345,30 @@ public class Home extends Activity implements View.OnClickListener {
 
         AppController.getInstance().addToRequestQueue(req,"FCM_REGISTER");
     }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d("Home","onConnectionFailed:"+connectionResult);
+        Toast.makeText(this, "Google Play Services error", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Closing Activity")
+                .setMessage("Are you sure you want to Exit?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
+
 }
 

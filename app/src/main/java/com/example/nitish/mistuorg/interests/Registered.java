@@ -71,7 +71,7 @@ public class Registered extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registered);
             SharedPreferences sharedPreferences=this.getSharedPreferences(Constants.SHARED_PREF,MODE_PRIVATE);
-            name =sharedPreferences.getString(Constants.FNAME,"")+ " "+sharedPreferences.getString(Constants.LNAME,"");
+            name =sharedPreferences.getString(Constants.NAME,"");
             department =sharedPreferences.getString(Constants.DEPARTMENT,"");
             stream = sharedPreferences.getString(Constants.STREAM,"");
             userId = sharedPreferences.getInt(Constants.USER_ID,0);

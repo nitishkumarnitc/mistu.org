@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -25,6 +26,13 @@ import com.example.nitish.mistuorg.app.AppController;
 import com.example.nitish.mistuorg.home.Home;
 import com.example.nitish.mistuorg.interests.Registered;
 import com.example.nitish.mistuorg.utils.Constants;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +42,7 @@ import java.io.ByteArrayOutputStream;
 /**
  * Created by nitish on 26-07-2016.
  */
-public class Verification extends AppCompatActivity implements View.OnClickListener{
+public class Verification extends AppCompatActivity implements View.OnClickListener,GoogleApiClient.OnConnectionFailedListener{
 
     private  boolean isInterestsSelected=false;
     private String userEmail;
@@ -42,11 +50,26 @@ public class Verification extends AppCompatActivity implements View.OnClickListe
     private ImageView imageToUpload=null;
     private static final int RESULT_LOAD_IMAGE=1;
     private String TAG="Verification";
+    GoogleApiClient mGoogleApiClient;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verification);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        mAuth = FirebaseAuth.getInstance();
+
 
         SharedPreferences sharedPreferences=this.getSharedPreferences(Constants.SHARED_PREF,MODE_PRIVATE);
         userEmail=sharedPreferences.getString(Constants.EMAIL_ID,"");
@@ -150,26 +173,15 @@ public class Verification extends AppCompatActivity implements View.OnClickListe
         try {
             int success=Integer.parseInt(response.getString(Constants.KEY_SUCCESS));
             if(success==1){
-                JSONObject user_details=new JSONObject();
-                user_details.put(Constants.USER_ID,Integer.parseInt(response.getString(Constants.EMAIL_ID)));
-                user_details.put(Constants.EMAIL_ID,response.getString(Constants.EMAIL_ID));
-                user_details.put(Constants.GOOGLE_UID,response.getString(Constants.GOOGLE_UID));
-                user_details.put(Constants.NAME,response.getString(Constants.NAME));
-                user_details.put(Constants.LOGIN_PROVIDER,response.getString(Constants.LOGIN_PROVIDER));
-                Constants.saveUserDetails(this,user_details);
+                Constants.saveUserDetails(this,response);
                 Constants.setUserLoginTrue(this);
                 Intent homeIntent=new Intent(this, Home.class);
                 startActivity(homeIntent);
 
             }else if(success==2){
-                Toast.makeText(Verification.this, "Verify your email address and login again", Toast.LENGTH_SHORT).show();
-                Intent loginIntent=new Intent(this,Begin.class);
-                startActivity(loginIntent);
+                Toast.makeText(Verification.this, "Need to provide other details", Toast.LENGTH_SHORT).show();
+                Constants.saveUserDetails(this,response);
 
-            }else if(success==3){
-                Toast.makeText(Verification.this, "Provide Mobile Number and Other details", Toast.LENGTH_SHORT).show();
-            }else if(success==4){
-                Toast.makeText(Verification.this, "Verification mail Not sent, Contact iHelp", Toast.LENGTH_SHORT).show();
             }else{
                 Toast.makeText(Verification.this, "", Toast.LENGTH_SHORT).show();
             }
@@ -206,4 +218,29 @@ public class Verification extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Toast.makeText(Verification.this, "Logged Out, Login again to feel the remaining details", Toast.LENGTH_SHORT).show();
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google sign out
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(@NonNull Status status) {
+                        //updateUI(null);
+                    }
+                });
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+    }
 }

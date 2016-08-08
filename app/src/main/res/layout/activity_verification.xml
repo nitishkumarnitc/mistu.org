@@ -241,7 +241,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:padding="7dp"
-                    android:text="@string/proceed"
+                    android:text="Enter into iHelp World"
                     android:textColor="#ffffff"
                     android:textSize="20sp"
                     android:textStyle="bold" />

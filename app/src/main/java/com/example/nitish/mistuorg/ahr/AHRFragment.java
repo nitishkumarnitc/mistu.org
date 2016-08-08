@@ -117,9 +117,7 @@ public class AHRFragment extends Fragment {
 
             for(int i=0;i<size;i++){
                 JSONObject jo=jsonArray.getJSONObject(i);
-                String name=jo.getString(Constants.FNAME);
-                String stream=jo.getString(Constants.LNAME);
-                String dept=jo.getString(Constants.DEPARTMENT);
+                String name=jo.getString(Constants.NAME);
                 String cat=jo.getString(Constants.CATEGORY);
                 String title=jo.getString(Constants.TITLE);
                 String description=jo.getString(Constants.DESCRIPTION);
@@ -154,9 +152,7 @@ public class AHRFragment extends Fragment {
                 name=name.substring(0,1).toUpperCase() + name.substring(1);
                 title=title.substring(0,1).toUpperCase()+title.substring(1);
                 description=description.substring(0,1).toUpperCase()+description.substring(1);
-                String branchStream=stream+" , "+dept;
-
-                fragmentListItems.add(new AHRFragmentListItem(name,branchStream,cat,title,description,
+                fragmentListItems.add(new AHRFragmentListItem(name,cat,title,description,
                         Integer.parseInt(helpId),helpieId,tag1,tag2,tag3));
             }
 

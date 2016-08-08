@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.nitish.mistuorg" >
+    package="com.example.nitish.mistuorg">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -17,8 +17,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
-        <activity android:name=".Begin" >
+        android:theme="@style/AppTheme">
+        <activity android:name=".Begin">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,7 +38,6 @@
         <activity android:name=".settings.Setting" />
         <activity android:name=".settings.Reset" />
         <activity android:name=".profile.AskedHelpInfo" />
-        <activity android:name=".utils.PDialog" />
         /
         <activity
             android:name=".search.Search"
@@ -55,6 +54,7 @@
             android:exported="true" />
 
         <activity android:name=".Login.GoogleLogin" />
+        <activity android:name=".login.GoogleLoginActivity" />
     </application>
 
 </manifest>

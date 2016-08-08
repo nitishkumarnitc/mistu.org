@@ -1,13 +1,10 @@
 package com.example.nitish.mistuorg.ask;
 
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,13 +21,15 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.nitish.mistuorg.R;
+import com.example.nitish.mistuorg.ahr.AHR;
 import com.example.nitish.mistuorg.app.AppController;
 import com.example.nitish.mistuorg.utils.Constants;
+import com.example.nitish.mistuorg.utils.ProgressDialogFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ASKFragment extends android.app.Fragment implements View.OnClickListener{
+public class ASKFragment extends ProgressDialogFragment implements View.OnClickListener{
     private final String TAG="ASKFragment";
     private Context context;
     private View rootView;
@@ -123,9 +122,6 @@ public class ASKFragment extends android.app.Fragment implements View.OnClickLis
             }else{
                 //Toast.makeText(context, "Calling sendHelpRequest", Toast.LENGTH_SHORT).show();
                 sendHelpRequest(titleStr,desStr);
-                Button submit=(Button)rootView.findViewById(R.id.ask_submit);
-                submit.setClickable(false);
-                //getActivity().finish();
             }
 
         }
@@ -133,6 +129,7 @@ public class ASKFragment extends android.app.Fragment implements View.OnClickLis
     }
 
     private void sendHelpRequest(String title,String des){
+        showProgressDialog("Sending Help Request");
         JSONObject values=new JSONObject();
         try {
             values.put("CODE","askforhelp");
@@ -154,31 +151,37 @@ public class ASKFragment extends android.app.Fragment implements View.OnClickLis
                     public void onResponse(JSONObject response) {
                         Log.d("ASK_FOR_HELP",response.toString());
                         try {
+                            hideProgressDialog();
+                            Button submit=(Button)rootView.findViewById(R.id.ask_submit);
+
                             if(response.getInt("success")==3){
+
                                 Toast.makeText(context,"Your Request is under process, we will notify you as soon as we find someone to help you !!!"
-                                        ,Toast.LENGTH_LONG).show();
+                                        ,Toast.LENGTH_SHORT).show();
                             }
+                            goToAhr();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
-                        //start AHR activity.
-                       /* Intent intent=new Intent(context,AHR.class);
-                        startActivity(intent);
-                        //finish this fragment
-                        getActivity().getFragmentManager().beginTransaction().remove(fragment).commit();
-                        getActivity().finish();*/
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 if(error instanceof NoConnectionError) {
+                    hideProgressDialog();
                     Toast.makeText(context,"No Internet Connection",Toast.LENGTH_LONG).show();
                 }
             }
         });
         AppController.getInstance().addToRequestQueue(helpRequest,TAG);
 
+    }
+
+    private void goToAhr(){
+        Intent ahrIntent=new Intent(context, AHR.class);
+        startActivity(ahrIntent);
+        getActivity().getFragmentManager().beginTransaction().remove(fragment).commit();
+        getActivity().finish();
     }
 
 }

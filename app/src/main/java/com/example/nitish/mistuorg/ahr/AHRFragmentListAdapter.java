@@ -21,14 +21,11 @@ public class AHRFragmentListAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<AHRFragmentListItem> fragListItems;
     private AHRFragmentListItem item;
-    private int currentUserId;
-    private Button acceptButton;
     private ImageLoader imageLoader= AppController.getInstance().getImageLoader();
 
     public AHRFragmentListAdapter(Context context, ArrayList<AHRFragmentListItem> fragListItems) {
         this.context = context;
         this.fragListItems = fragListItems;
-        this.currentUserId= Constants.getCurrentUserID(context);
     }
 
 
@@ -56,16 +53,14 @@ public class AHRFragmentListAdapter extends BaseAdapter {
         }
 
         View layout=convertView.findViewById(R.id.ahr_frag_list_rel_lay);
-        NetworkImageView helpie_pic=(NetworkImageView)convertView.findViewById(R.id.hr_pic);
+        NetworkImageView helpiePic=(NetworkImageView)convertView.findViewById(R.id.hr_pic);
         TextView hrName=(TextView)convertView.findViewById(R.id.hr_name);
-        TextView hrStreamBranch=(TextView)convertView.findViewById(R.id.hr_stream_branch);
         TextView hrTitle=(TextView)convertView.findViewById(R.id.hr_title);
 
 
         hrName.setText(fragListItems.get(position).getName());
-        hrStreamBranch.setText(fragListItems.get(position).getStreamBranch());
         hrTitle.setText(fragListItems.get(position).getHrTitle());
-        helpie_pic.setImageUrl(Constants.getImagesUrl(fragListItems.get(position).getHelpieId()),imageLoader);
+        helpiePic.setImageUrl(Constants.getImagesUrl(fragListItems.get(position).getHelpieId()),imageLoader);
 
 
         ImageView viewReq=(ImageView)convertView.findViewById(R.id.ahr_view_image);
@@ -77,7 +72,6 @@ public class AHRFragmentListAdapter extends BaseAdapter {
                 item= fragListItems.get(position);
 
                 intent.putExtra("NAME",item.getName());
-                intent.putExtra("BRANCH_STREAM",item.getStreamBranch());
                 intent.putExtra("CAT",item.getCategory());
                 intent.putExtra("TITLE",item.getHrTitle());
                 intent.putExtra("DES",item.getHrDetails());

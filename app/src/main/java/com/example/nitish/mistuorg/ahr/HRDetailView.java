@@ -26,7 +26,7 @@ import org.json.JSONObject;
 
 public class HRDetailView extends AppCompatActivity {
 
-    private String name,branchStream,category,title,description,tag1,tag2,tag3;
+    private String name,category,title,description,tag1,tag2,tag3;
     private int picId,helpId,helpieId;
     private int currentUserId;
     private NetworkImageView helpie_pic;
@@ -45,7 +45,6 @@ public class HRDetailView extends AppCompatActivity {
         currentUserId= Constants.getCurrentUserID(this);
 
         name=intent.getStringExtra("NAME");
-        branchStream=intent.getStringExtra("BRANCH_STREAM");
         category=intent.getStringExtra("CAT");
         title=intent.getStringExtra("TITLE");
         description=intent.getStringExtra("DES");
@@ -62,7 +61,6 @@ public class HRDetailView extends AppCompatActivity {
 
     private void setLayoutData(){
         TextView name=(TextView)findViewById(R.id.hr_details_helpie_name);
-        TextView branch=(TextView)findViewById(R.id.hr_details_helpie_branch);
         TextView cat=(TextView)findViewById(R.id.hr_details_category);
         TextView title=(TextView)findViewById(R.id.hr_details_title);
         TextView des=(TextView)findViewById(R.id.hr_details_description);
@@ -78,7 +76,6 @@ public class HRDetailView extends AppCompatActivity {
 
         helpie_pic=(NetworkImageView)findViewById(R.id.hr_details_pic);
         name.setText(this.name);
-        branch.setText(this.branchStream);
         cat.setText(this.category);
         title.setText(this.title);
         des.setText(this.description);

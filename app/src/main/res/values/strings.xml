@@ -1005,4 +1005,5 @@
     <string name="home_noti_text">Check your help request status, grab an opportunity to help someone and much more !</string>
     <string name="home_search_text">Want to find people sharing interests and skills same as yours ?</string>
     <string name="name">name</string>
+    <string name="title_activity_google_login">GoogleLoginActivity</string>
 </resources>

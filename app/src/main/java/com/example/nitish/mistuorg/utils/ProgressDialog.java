@@ -1,21 +1,22 @@
 package com.example.nitish.mistuorg.utils;
 
-import android.app.ProgressDialog;
 import android.content.Context;
+import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.nitish.mistuorg.R;
 
 /**
- * Created by nitish on 30-07-2016.
+ * Created by nitish on 09-08-2016.
  */
-public class PDialog extends AppCompatActivity {
+public class ProgressDialog extends AppCompatActivity {
 
-    private static ProgressDialog mProgressDialog;
+    @VisibleForTesting
+    public android.app.ProgressDialog mProgressDialog;
 
-    public static void showProgressDialog(Context context,String message) {
+    public void showProgressDialog(String message) {
         if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(context);
+            mProgressDialog = new android.app.ProgressDialog(this);
             mProgressDialog.setMessage(message);
             mProgressDialog.setIndeterminate(true);
         }
@@ -23,16 +24,16 @@ public class PDialog extends AppCompatActivity {
         mProgressDialog.show();
     }
 
-    public static void hideProgressDialog(Context context) {
+    public void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
     }
 
     @Override
-    public void onStop() {
+    protected void onStop() {
         super.onStop();
-        hideProgressDialog(this);
+        hideProgressDialog();
     }
-
 }
+

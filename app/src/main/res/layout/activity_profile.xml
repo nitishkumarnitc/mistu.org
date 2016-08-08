@@ -56,23 +56,6 @@
             android:textColor="@color/googleBackground"
             android:textSize="20sp"
             android:textStyle="normal" />
-
-        <TextView
-            android:id="@+id/profile_branch_stream"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/profile_name"
-            android:layout_marginStart="5dp"
-            android:paddingEnd="5dp"
-            android:paddingStart="5dp"
-            android:text="@string/pic_branchStream"
-            android:textAllCaps="true"
-            android:textColor="@color/googleBackground"
-            android:textSize="14sp"
-            android:textStyle="normal" />
-
-
-
         <TextView
             android:id="@+id/profile_interests"
             android:layout_width="wrap_content"

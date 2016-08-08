@@ -13,7 +13,7 @@ import org.json.JSONObject;
 public class Constants {
     // server home url
     public static final String HOME_URL = "http://www.mistu.org/ihelp/";
-    public static final String IMAGES_URL="http://www.mistu.org/ihelp/email/pictures/";
+    public static final String IMAGES_URL="http://www.mistu.org/ihelp/login/pictures/";
     public static final String SERVER_RESPONSE="server_response";
     public static final String NO_NET_WORK_CONNECTION="No NetWork Connection";
     //Fire base app url
@@ -73,9 +73,7 @@ public class Constants {
 
     public static boolean isUserLogin(Context context){
        SharedPreferences sharedPreferences= context.getSharedPreferences(SHARED_PREF,Context.MODE_PRIVATE);
-        if(sharedPreferences.getBoolean(IS_USER_LOGIN,false)==true){
-            return true;
-        } else return false;
+        return sharedPreferences.getBoolean(IS_USER_LOGIN,false);
     }
 
     public static void setUserLoginTrue(Context context){
@@ -91,8 +89,15 @@ public class Constants {
     }
 
     public static void logOutUser(Context context){
-        context.getSharedPreferences(SHARED_PREF,Context.MODE_PRIVATE).edit().clear().commit();
-        context.getSharedPreferences(NOTIF_SHARED_PREF,Context.MODE_PRIVATE).edit().clear().commit();
+        SharedPreferences sharedPreferences=context.getSharedPreferences(SHARED_PREF,Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putBoolean(Constants.IS_USER_LOGIN,false);
+        editor.commit();
+
+        SharedPreferences sharedPreferences1=context.getSharedPreferences(NOTIF_SHARED_PREF,Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor1=sharedPreferences1.edit();
+        editor1.putBoolean(Constants.REGISTERED_WITH_FCM,false);
+        editor1.commit();
 
     }
 
