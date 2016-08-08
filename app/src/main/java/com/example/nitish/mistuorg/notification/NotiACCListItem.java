@@ -2,7 +2,6 @@ package com.example.nitish.mistuorg.notification;
 
 public class NotiACCListItem {
     private String name;
-    private String branchStream;
     private float rating;
 
     private String category;
@@ -16,12 +15,11 @@ public class NotiACCListItem {
 
 
 
-    public NotiACCListItem(String branchStream, String category, int currentUserId,
+    public NotiACCListItem(String category, int currentUserId,
                            String description, int hasContacted, int hasSkipped, int helperId,
                            int helpId, String name, int notiId, float rating, String tag1, String tag2,
                            String tag3, String title) {
 
-        this.branchStream = branchStream;
         this.category = category;
         this.currentUserId = currentUserId;
         this.description = description;
@@ -55,14 +53,6 @@ public class NotiACCListItem {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getBranchStream() {
-        return branchStream;
-    }
-
-    public void setBranchStream(String branchStream) {
-        this.branchStream = branchStream;
     }
 
     public float getRating() {

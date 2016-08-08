@@ -50,12 +50,12 @@ public class AcceptsAdapter extends BaseAdapter {
 
         category.setText(item.getCategory());
         title.setText(item.getTitle());
-        name.setText(item.getFname());
+        name.setText(item.getName());
 
 
         ImageLoader imageLoader= AppController.getInstance().getImageLoader();
         NetworkImageView helpie_pic=(NetworkImageView) convertView.findViewById(R.id.profile_accepts_item_pic);
-        helpie_pic.setImageUrl(Constants.HOME_URL+"email/pictures/"+item.getUserId()+".jpg",imageLoader);
+        helpie_pic.setImageUrl(Constants.getImagesUrl(item.getUserId()),imageLoader);
 
         return convertView;
     }

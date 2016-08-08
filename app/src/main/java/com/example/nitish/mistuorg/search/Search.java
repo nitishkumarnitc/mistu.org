@@ -184,20 +184,14 @@ public class Search extends AppCompatActivity {
             for(int i=0;i<size;i++){
                 JSONObject jo=jsonArray.getJSONObject(i);
 
-                String fname=jo.getString(Constants.FNAME);
-                String lname=jo.getString(Constants.LNAME);
-                String stream=jo.getString(Constants.STREAM);
-                String dept=jo.getString(Constants.DEPARTMENT);
+                String name=jo.getString(Constants.NAME);
                 int userId=Integer.parseInt(jo.getString(Constants.USER_ID));
                 String mobile=jo.getString(Constants.MOBILE);
                 int hasUserConfirmed=Integer.parseInt(jo.getString(Constants.STATUS));
 
-                fname=fname.substring(0,1).toUpperCase() + fname.substring(1);
-                lname=lname.substring(0,1).toUpperCase() + lname.substring(1);
+                name=name.substring(0,1).toUpperCase() + name.substring(1);
 
-                String branchStream=dept+", "+stream;
-
-                listItems.add(new SearchResultUser(branchStream,hasUserConfirmed,fname+" "+lname,userId,mobile));
+                listItems.add(new SearchResultUser(hasUserConfirmed,name,userId,mobile));
 
             }
 

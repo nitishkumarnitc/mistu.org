@@ -103,7 +103,7 @@ public class NotiContactReqFragment extends Fragment {
         for(int i=0;i<size;i++){
             JSONObject jo=jsonArray.getJSONObject(i);
 
-            String name=jo.getString("fname")+" "+jo.getString("lname");
+            String name=jo.getString(Constants.NAME);
             float rating=Float.parseFloat(jo.getString("rating"));
             int requesterID=Integer.parseInt(jo.getString(Constants.USER_ID));
             int type=Integer.parseInt(jo.getString("type"));

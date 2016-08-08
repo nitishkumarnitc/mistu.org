@@ -45,6 +45,16 @@ public class Begin extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if(Constants.isUserLogin(this)){
+            Intent intent=new Intent(this,Home.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         Fragment loginFragment=new LoginFragment();

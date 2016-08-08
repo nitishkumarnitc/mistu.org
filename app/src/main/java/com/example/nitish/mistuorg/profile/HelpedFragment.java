@@ -108,11 +108,7 @@ public class HelpedFragment extends Fragment {
             for(int i=0;i<size;i++){
                 JSONObject jo=jsonArray.getJSONObject(i);
 
-                String fname=jo.getString("fname");
-                String lname=jo.getString("lname");
-                String sex=jo.getString("sex");
-                String stream=jo.getString("stream");
-                String dept=jo.getString("department");
+                String name=jo.getString(Constants.NAME);
 
                 String cat=jo.getString(Constants.CATEGORY);
                 String title=jo.getString("title");
@@ -145,13 +141,12 @@ public class HelpedFragment extends Fragment {
                     tag3=jo.getString("tag3");
                 }
 
-                fname=fname.substring(0,1).toUpperCase() + fname.substring(1);
-                lname=lname.substring(0,1).toUpperCase() + lname.substring(1);
+                name=name.substring(0,1).toUpperCase() + name.substring(1);
                 title=title.substring(0,1).toUpperCase()+title.substring(1);
                 description=description.substring(0,1).toUpperCase()+description.substring(1);
 
-                listItems.add(new ProfileListItem(dept, cat, description, fname,
-                        helpId, lname, stream, sex, tag1,tag2,tag3,title, helpieId));
+                listItems.add(new ProfileListItem(cat, description, name,
+                        helpId,tag1,tag2,tag3,title, helpieId));
 
 
             }

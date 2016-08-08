@@ -51,18 +51,14 @@ public class Profile extends AppCompatActivity {
 
     private void displayUserDetails(){
         SharedPreferences sharedPreferences=this.getSharedPreferences(Constants.SHARED_PREF,MODE_PRIVATE);
-        String fullname=sharedPreferences.getString(Constants.FNAME,"")+" "+ sharedPreferences.getString(Constants.LNAME,"");
-        String stream=sharedPreferences.getString(Constants.STREAM,"");
-        String department=sharedPreferences.getString(Constants.DEPARTMENT,"");
+        String fullname=sharedPreferences.getString(Constants.NAME,"");
 
         TextView name=(TextView)findViewById(R.id.profile_name);
-        TextView branchStream=(TextView)findViewById(R.id.profile_branch_stream);
         userPic=(NetworkImageView)findViewById(R.id.profile_pic);
 
         name.setText(fullname);
-        branchStream.setText(stream+","+department);
 
-        userPic.setImageUrl(Constants.HOME_URL+"email/pictures/"+currentUserId+".jpg",imageLoader);
+        userPic.setImageUrl(Constants.getImagesUrl(currentUserId),imageLoader);
 
         TextView interests=(TextView)findViewById(R.id.profile_interests);
         if(interests!=null) {

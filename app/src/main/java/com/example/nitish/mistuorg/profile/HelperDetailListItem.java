@@ -3,20 +3,9 @@ package com.example.nitish.mistuorg.profile;
 public class HelperDetailListItem {
     private int helperId;
     private String name;
-    private String branchStream;
-
-    public HelperDetailListItem(int helperId, String branchStream, String name) {
+    public HelperDetailListItem(int helperId,String name) {
         this.helperId = helperId;
-        this.branchStream = branchStream;
         this.name = name;
-    }
-
-    public String getBranchStream() {
-        return branchStream;
-    }
-
-    public void setBranchStream(String branchStream) {
-        this.branchStream = branchStream;
     }
 
     public int getHelperId() {

@@ -50,7 +50,6 @@ public class HelperDetailListAdapter extends BaseAdapter{
         }
 
         TextView name=(TextView)convertView.findViewById(R.id.helper_detail_name);
-        TextView branch=(TextView)convertView.findViewById(R.id.helper_detail_branch);
         final ImageView contact=(ImageView)convertView.findViewById(R.id.helper_detail_contact);
         //tick is used in search activity, here we are not using it. hence it is hidden
         ImageView tick=(ImageView)convertView.findViewById(R.id.user_confirmed);
@@ -58,7 +57,6 @@ public class HelperDetailListAdapter extends BaseAdapter{
 
         HelperDetailListItem item=listItems.get(position);
         name.setText(item.getName());
-        branch.setText(item.getBranchStream());
 
         NetworkImageView helperImageView=(NetworkImageView) convertView.findViewById(R.id.helper_detail_pic);
         helperImageView.setImageUrl(Constants.getImagesUrl(item.getHelperId()),imageLoader);

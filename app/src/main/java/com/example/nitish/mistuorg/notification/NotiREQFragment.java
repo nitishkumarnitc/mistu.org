@@ -108,10 +108,8 @@ public class NotiREQFragment extends Fragment {
 
 
 
-            String name=jo.getString("fname");
-            String branch=jo.getString("department");
-            String stream=jo.getString("stream");
-            String category=jo.getString("categories");
+            String name=jo.getString(Constants.NAME);
+            String category=jo.getString(Constants.CATEGORY);
             String description=jo.getString("description");
             String tag1=jo.getString("tag1");
             String tag2=jo.getString("tag2");
@@ -127,13 +125,12 @@ public class NotiREQFragment extends Fragment {
             name=name.substring(0,1).toUpperCase() + name.substring(1);
             title=title.substring(0,1).toUpperCase()+title.substring(1);
             description=description.substring(0,1).toUpperCase()+description.substring(1);
-            String branchStream=stream+" , "+ branch;
 
-            String temp=""+notiId+ name+ branchStream+ category + title+
+            String temp=""+notiId+ name+ category + title+
                     description+ tag1+  tag2+  tag3+ helpId+ helpieId+ currentUserId+ isAccepted;
             Log.i("REQLISTITEM",temp);
 
-            notiREQListItems.add(new NotiREQListItem(notiId, name, branchStream, category, title,
+            notiREQListItems.add(new NotiREQListItem(notiId, name, category, title,
                             description,  tag1,  tag2,  tag3, helpId, helpieId, currentUserId, isAccepted));
 
         }

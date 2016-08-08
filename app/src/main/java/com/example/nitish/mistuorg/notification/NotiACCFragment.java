@@ -109,10 +109,8 @@ public class NotiACCFragment extends Fragment {
         for(int i=0;i<size;i++){
             JSONObject jo=jsonArray.getJSONObject(i);
 
-            String name=jo.getString("fname")+" "+jo.getString("lname");
-            String department=jo.getString("department");
-            String stream=jo.getString("stream");
-            String category=jo.getString("categories");
+            String name=jo.getString(Constants.NAME);
+            String category=jo.getString(Constants.CATEGORY);
             String description=jo.getString("description");
             String tag1=jo.getString("tag1");
             String tag2=jo.getString("tag2");
@@ -134,9 +132,8 @@ public class NotiACCFragment extends Fragment {
             name=name.substring(0,1).toUpperCase() + name.substring(1);
             title=title.substring(0,1).toUpperCase()+title.substring(1);
             description=description.substring(0,1).toUpperCase()+description.substring(1);
-            String branchStream=department+" , "+ stream;
 
-            notiACCListItems.add(new NotiACCListItem(branchStream, category,currentUserId,
+            notiACCListItems.add(new NotiACCListItem(category,currentUserId,
             description,  hasContacted,  hasSkipped,  helperId,
             helpId,  name, notiId,  rating,  tag1,  tag2, tag3,  title));
 

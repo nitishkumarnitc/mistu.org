@@ -113,12 +113,7 @@ public class AskedFragment extends Fragment {
             for(int i=0;i<size;i++){
                 JSONObject jo=jsonArray.getJSONObject(i);
                 SharedPreferences sharedPreferences=context.getSharedPreferences(Constants.SHARED_PREF,Context.MODE_PRIVATE);
-                String fname=sharedPreferences.getString(Constants.FNAME,"");
-                String lname=sharedPreferences.getString(Constants.LNAME,"");
-                String sex=sharedPreferences.getString(Constants.SEX,"");
-                String stream=sharedPreferences.getString(Constants.STREAM,"");
-                String dept=sharedPreferences.getString(Constants.DEPARTMENT,"");
-
+                String name=sharedPreferences.getString(Constants.NAME,"");
                 String cat=jo.getString(Constants.CATEGORY);
                 String title=jo.getString("title");
                 String description=jo.getString("description");
@@ -150,13 +145,12 @@ public class AskedFragment extends Fragment {
                     tag3=jo.getString("tag3");
                 }
 
-                fname=fname.substring(0,1).toUpperCase() + fname.substring(1);
-                lname=lname.substring(0,1).toUpperCase() + lname.substring(1);
+                name=name.substring(0,1).toUpperCase() + name.substring(1);
                 title=title.substring(0,1).toUpperCase()+title.substring(1);
                 description=description.substring(0,1).toUpperCase()+description.substring(1);
 
-                listItems.add(new ProfileListItem(dept, cat, description, fname,
-                        helpId, lname, stream, sex, tag1,tag2,tag3,title, helpieId));
+                listItems.add(new ProfileListItem(cat, description, name,
+                        helpId, tag1,tag2,tag3,title, helpieId));
 
 
             }

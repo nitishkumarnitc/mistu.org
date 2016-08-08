@@ -79,7 +79,7 @@ public class NotiContactReqAdapter extends BaseAdapter {
                 }
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("HELPER_ID",item.getRequesterID());
-                intent.putExtra(Constants.FNAME,item.getName());
+                intent.putExtra(Constants.NAME,item.getName());
                 intent.putExtra("MOBILE_NO",item.getMobile());
                 intent.putExtra("HAS_USER_CONFIRMED",item.getHasUserConfirmed());
                 context.startActivity(intent);

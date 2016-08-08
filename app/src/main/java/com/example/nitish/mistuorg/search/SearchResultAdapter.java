@@ -55,14 +55,12 @@ public class SearchResultAdapter extends BaseAdapter{
         }
         ImageView tick=(ImageView)convertView.findViewById(R.id.user_confirmed);
         TextView name=(TextView)convertView.findViewById(R.id.helper_detail_name);
-        TextView branch=(TextView)convertView.findViewById(R.id.helper_detail_branch);
         final ImageView contact=(ImageView)convertView.findViewById(R.id.helper_detail_contact);
 
         NetworkImageView profilePic=(NetworkImageView) convertView.findViewById(R.id.helper_detail_pic);
         final SearchResultUser item=listItems.get(position);
 
         name.setText(item.getName());
-        branch.setText(item.getBranchStream());
         profilePic.setImageUrl(Constants.getImagesUrl(item.getUserId()),imageLoader);
 
         if(item.getHasUserConfirmed()!=1){
@@ -100,7 +98,7 @@ public class SearchResultAdapter extends BaseAdapter{
                 Intent intent=new Intent(context, ProfileView.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("HELPER_ID",item.getUserId());
-                intent.putExtra(Constants.FNAME,item.getName());
+                intent.putExtra(Constants.NAME,item.getName());
                 intent.putExtra("MOBILE_NO",item.getMobile());
                 intent.putExtra("HAS_USER_CONFIRMED",item.getHasUserConfirmed());
                 context.startActivity(intent);

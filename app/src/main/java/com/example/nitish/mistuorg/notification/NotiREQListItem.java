@@ -4,7 +4,6 @@ package com.example.nitish.mistuorg.notification;
 public class NotiREQListItem {
     private int notiId;
     private String name;
-    private String branchStream;
     private String category;
     private String title;
     private String description;
@@ -16,12 +15,11 @@ public class NotiREQListItem {
     private int picId;
 
 
-    public NotiREQListItem(int notiId,String name, String branchStream, String category, String title,
+    public NotiREQListItem(int notiId,String name,String category, String title,
                            String description, String tag1, String tag2, String tag3, int helpId,
                            int helpieId, int currentUserId, int isAccepted) {
         this.notiId=notiId;
         this.name = name;
-        this.branchStream = branchStream;
         this.category = category;
         this.title = title;
         this.description = description;
@@ -34,9 +32,8 @@ public class NotiREQListItem {
         this.isAccepted = isAccepted;
     }
 
-    public NotiREQListItem(String name, String branchStream, String category, String title) {
+    public NotiREQListItem(String name,  String category, String title) {
         this.name = name;
-        this.branchStream = branchStream;
         this.category = category;
         this.title = title;
     }
@@ -120,14 +117,6 @@ public class NotiREQListItem {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getBranchStream() {
-        return branchStream;
-    }
-
-    public void setBranchStream(String branchStream) {
-        this.branchStream = branchStream;
     }
 
     public String getCategory() {

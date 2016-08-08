@@ -17,7 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -30,7 +30,6 @@ import com.example.nitish.mistuorg.app.AppController;
 import com.example.nitish.mistuorg.home.Home;
 import com.example.nitish.mistuorg.settings.Reset;
 import com.example.nitish.mistuorg.utils.Constants;
-import com.firebase.client.Firebase;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -48,7 +47,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,16 +58,12 @@ public class LoginFragment extends Fragment implements
         GoogleApiClient.OnConnectionFailedListener{
     private View rootView=null;
     private Context context=null;
-    private ProgressDialog nDialog;
     private static  final String TAG_NETCHECK="Login NetCheck";
     private Button btnLogin;
     private EditText inputEmail;
     private EditText inputPassword;
-    private static String KEY_SUCCESS = "success";
     private static final String TAG = "LoginFragment";
     private static final int RC_SIGN_IN = 9001;
-    NetworkImageView google_pic;
-
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -81,21 +75,22 @@ public class LoginFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView= inflater.inflate(R.layout.fragment_login, container, false);
         context=inflater.getContext();
-        google_pic=(NetworkImageView)rootView.findViewById(R.id.google_pic);
 
         GoogleSignInOptions gso=new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).
                 requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
+
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .enableAutoManage(getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+
         final SignInButton signInButton=(SignInButton)rootView.findViewById(R.id.email_sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         signInButton.setScopes(gso.getScopeArray());
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                signIn();
+                signInUsingGoogle();
             }
         });
 
@@ -107,12 +102,9 @@ public class LoginFragment extends Fragment implements
                 if (user!=null){
                     Log.d(TAG,"onAuthStateChanged:signed_in:"+user.getUid());
                     Log.d(TAG,"email_id:"+user.getEmail());
-                    if(user.getPhotoUrl()!=null){
-                        Log.d(TAG,"pic:"+user.getPhotoUrl());
-                        ImageLoader imageLoader=AppController.getInstance().getImageLoader();
-                        google_pic.setImageUrl(String.valueOf(user.getPhotoUrl()),imageLoader);
-                    }
                     Log.d(TAG,"Name"+user.getDisplayName());
+                    Log.d(TAG,"LOgin Provider"+user.getProviderId());
+                    attemptLoginWithServer(user);
 
                 }else{
                     Log.d(TAG,"onAuthStateChanged:signed_out");
@@ -133,7 +125,9 @@ public class LoginFragment extends Fragment implements
             @Override
             public void onClick(View v) {
                 if ((!inputEmail.getText().toString().equals("")) && (!inputPassword.getText().toString().equals(""))) {
-                    sendLoginRequest();
+
+                    sendLoginRequestToFirebase();
+
                 } else if ((!inputEmail.getText().toString().equals(""))) {
                     Toast.makeText(context, "Password can't be empty !!!", Toast.LENGTH_SHORT).show();
                 } else if ((!inputPassword.getText().toString().equals(""))) {
@@ -158,69 +152,27 @@ public class LoginFragment extends Fragment implements
         return rootView;
     }
 
-    public void sendLoginRequest(){
-        Log.d(TAG_NETCHECK, "inside preExecute");
-       nDialog = new ProgressDialog(getActivity());
-        nDialog.setTitle("Loging in...");
-        nDialog.setMessage("Loading..");
-        nDialog.setIndeterminate(false);
-        nDialog.setCancelable(true);
-        nDialog.show();
+    public void sendLoginRequestToFirebase(){
+        Log.d(TAG_NETCHECK, "inside sendLoginRequestToFirebase");
 
         inputEmail= (EditText)rootView.findViewById(R.id.login_email);
         inputPassword= (EditText)rootView.findViewById(R.id.login_password);
 
         final String email_id=inputEmail.getText().toString();
         final String password=inputPassword.getText().toString();
-        JSONObject jsonObject=new JSONObject();
-        try {
-            jsonObject.put("tag","login");
-            jsonObject.put("email_id",email_id);
-            jsonObject.put("password",password);
-            Log.d("values sent are",email_id+ " "+ password);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
-        JsonObjectRequest objectRequest=new JsonObjectRequest(Request.Method.POST, Constants.HOME_URL + "login/", jsonObject
-                , new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                nDialog.dismiss();
-                try {
-                    Log.d("Server Response",response.toString());
-                    int success=Integer.valueOf(response.getString(KEY_SUCCESS));
-                    int error=Integer.valueOf(response.getString(Constants.KEY_ERROR));
-                    if(success==1){
-                            Constants.saveUserDetails(context,response);
-                            Constants.setUserLoginTrue(context);
-                            goToHome();
-
-                    }else if (success==2){
-                        Toast.makeText(context,"Oops! You forgot to verify your Email Id.",Toast.LENGTH_LONG).show();
-
-                    }else if(error==1){
-                            Toast.makeText(context, "Invalid Email id and password", Toast.LENGTH_SHORT).show();
-
-                    }else if(success==0){
-                            Constants.saveUserDetails(context,response);
-                             goToVerification();
+        mAuth.signInWithEmailAndPassword(email_id, password)
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "signInWithEmail:failed", task.getException());
+                            Toast.makeText(context,"Auth Failed",
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                nDialog.dismiss();
-                if(error instanceof NoConnectionError) {
-                    Toast.makeText(context,"No Internet Connection",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        AppController.getInstance().addToRequestQueue(objectRequest,"get_json_Array");
+                });
     }
 
 
@@ -270,15 +222,10 @@ public class LoginFragment extends Fragment implements
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
 
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
                         }
-                        // [START_EXCLUDE]
-                        //hideProgressDialog();
-                        // [END_EXCLUDE]
+
                     }
                 });
 
@@ -298,24 +245,81 @@ public class LoginFragment extends Fragment implements
         }
     }
 
-    private void signIn(){
+    private void signInUsingGoogle(){
         Toast.makeText(context, "Google signin called", Toast.LENGTH_SHORT).show();
         Intent signInIntent=Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent,RC_SIGN_IN);
     }
 
-    private void signOut(){
-        mAuth.signOut();
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
+    private void attemptLoginWithServer(FirebaseUser user){
+        JSONObject values=new JSONObject();
+        try {
+            values.put(Constants.SERVER_TAG,"create_user");
+            values.put(Constants.NAME,user.getDisplayName());
+            values.put(Constants.EMAIL_ID,user.getEmail());
+            values.put(Constants.GOOGLE_UID,user.getUid());
+            values.put(Constants.LOGIN_PROVIDER,user.getProviderId());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, Constants.HOME_URL + "login/", values,
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResult(@NonNull Status status) {
-                        // signOutThe User
-                        Constants.logOutUser(context);
-                        Toast.makeText(context, "SuccessfullyLoggedOut", Toast.LENGTH_SHORT).show();
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG,"onResponse:"+response.toString());
+                        parseSeverResponse(response);
                     }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(error instanceof NetworkError){
+                    Toast.makeText(context,Constants.NO_NET_WORK_CONNECTION, Toast.LENGTH_SHORT).show();
                 }
-        );
+            }
+        });
+        AppController.getInstance().addToRequestQueue(request,TAG);
+
+    }
+
+    private void parseSeverResponse(JSONObject response){
+        try {
+            int success=Integer.parseInt(response.getString(Constants.KEY_SUCCESS));
+            if(success==1){
+                Log.d(TAG,"Login Successfull: going to home");
+                JSONObject values=new JSONObject();
+                values.put(Constants.USER_ID,Integer.parseInt(response.getString(Constants.USER_ID)));
+                values.put(Constants.EMAIL_ID,response.getString(Constants.EMAIL_ID));
+                values.put(Constants.GOOGLE_UID,response.getString(Constants.GOOGLE_UID));
+                values.put(Constants.LOGIN_PROVIDER,response.getString(Constants.LOGIN_PROVIDER));
+                values.put(Constants.NAME,response.getString(Constants.NAME));
+                Constants.saveUserDetails(context,values);
+                Constants.setUserLoginTrue(context);
+                goToHome();
+            }else if(success==2){
+                Log.d(TAG,"should fill other details");
+                JSONObject values=new JSONObject();
+                values.put(Constants.USER_ID,Integer.parseInt(response.getString(Constants.USER_ID)));
+                values.put(Constants.EMAIL_ID,response.getString(Constants.EMAIL_ID));
+                values.put(Constants.GOOGLE_UID,response.getString(Constants.GOOGLE_UID));
+                values.put(Constants.LOGIN_PROVIDER,response.getString(Constants.LOGIN_PROVIDER));
+                values.put(Constants.NAME,response.getString(Constants.NAME));
+                Constants.saveUserDetails(context,values);
+                goToVerification();
+            }else if(success==3){
+                Log.d(TAG,"should verify your email address");
+                Toast.makeText(context, "You need to verify your email address and Login again", Toast.LENGTH_SHORT).show();
+            }else if(success==4){
+                Log.d(TAG,"verification mail not sent, so contact iHelp");
+            }else {
+                Log.d(TAG,"UNKNOWN Eroror");
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

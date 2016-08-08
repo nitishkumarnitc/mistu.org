@@ -1004,4 +1004,5 @@
     <string name="home_ahr_text">People are helping each other. May be you can help someone too !</string>
     <string name="home_noti_text">Check your help request status, grab an opportunity to help someone and much more !</string>
     <string name="home_search_text">Want to find people sharing interests and skills same as yours ?</string>
+    <string name="name">name</string>
 </resources>

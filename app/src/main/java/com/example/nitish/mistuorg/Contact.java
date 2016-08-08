@@ -36,7 +36,6 @@ import java.net.URL;
 
 public class Contact extends AppCompatActivity {
     private String name;
-    private String branchStream;
     private int userId,helpId,helpieId,notiId;
     private NetworkImageView userPic;
     private TextView emailText,phoneText,nameText,branchText;
@@ -81,11 +80,8 @@ public class Contact extends AppCompatActivity {
     private void setValuesOfLayout(){
         userPic=(NetworkImageView)findViewById(R.id.contact_pic);
         nameText=(TextView)findViewById(R.id.contact_name);
-        branchText=(TextView)findViewById(R.id.contact_branch);
-
         emailText=(TextView)findViewById(R.id.contact_emailID);
         phoneText=(TextView)findViewById(R.id.contact_phoneNum);
-
         emailContainer=findViewById(R.id.contact_email_container);
         phoneContainer=findViewById(R.id.contact_phone_num_container);
         databaseTransaction();
@@ -128,25 +124,16 @@ public class Contact extends AppCompatActivity {
 
            private void displayAHRList(JSONObject jo)throws JSONException{
             jo=jo.getJSONObject(Constants.SERVER_RESPONSE);
-            String fname=jo.getString(Constants.FNAME);
-            String lname=jo.getString(Constants.LNAME);
-            String stream=jo.getString(Constants.STREAM);
-            String dept=jo.getString(Constants.DEPARTMENT);
+            String name=jo.getString(Constants.NAME);
             final String mobile=jo.getString(Constants.MOBILE);
-            String city=jo.getString(Constants.CITY);
             final String emailId=jo.getString(Constants.EMAIL_ID);
 
-            fname=fname.substring(0,1).toUpperCase() + fname.substring(1);
-            lname=lname.substring(0,1).toUpperCase() + lname.substring(1);
-            String name=fname+" "+lname;
-            String branchStream=stream+" , "+dept;
-
+            name=name.substring(0,1).toUpperCase() + name.substring(1);
 
             nameText.setText(name);
-            branchText.setText(branchStream);
             emailText.setText(emailId);
             phoneText.setText(mobile);
-            userPic.setImageUrl(Constants.IMAGES_URL+userId+".jpg",imageLoader);
+            userPic.setImageUrl(Constants.getImagesUrl(userId),imageLoader);
 
             emailContainer.setOnClickListener(new View.OnClickListener(){
                 @Override

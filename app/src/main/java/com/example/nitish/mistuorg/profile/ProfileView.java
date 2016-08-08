@@ -56,12 +56,12 @@ public class ProfileView extends AppCompatActivity {
         if (getIntent() != null) {
             type=getIntent().getStringExtra("TYPE");
             helperID = getIntent().getIntExtra("HELPER_ID", -1);
-            name = getIntent().getStringExtra(Constants.FNAME);
+            name = getIntent().getStringExtra(Constants.NAME);
             hasUserConfirmed = getIntent().getIntExtra("HAS_USER_CONFIRMED", 0);
             mobile = getIntent().getStringExtra("MOBILE_NO");
         } else {
             helperID = -1;
-            name = Constants.getCurrentFname(this) + " " + Constants.getCurrentLname(this);
+            name = Constants.getCurrentName(this);
             hasUserConfirmed = 0;
         }
 
